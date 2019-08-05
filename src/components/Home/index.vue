@@ -3,7 +3,10 @@
     <div class="column is-half is-offset-one-quarter">
       <h4 class="centerText title">Welcome to my Calendar</h4>
       <p class="centerText">This is an example of a Calendar in VueJs.</p>
-      <p class="centerText">In the header go to Calendar.</p>
+      <p class="centerText">Using Vuex, Buefy, Puppeteer</p>
+      <p class="centerText">You can move between months</p>
+      <p class="centerText">Create, Edit, Delete events</p>
+      <p class="centerText">In the header you can go to Calendar.</p>
       <p class="centerText">I hope you enjoy it!.</p>
     </div>
   </div>
