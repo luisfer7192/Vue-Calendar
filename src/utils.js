@@ -47,8 +47,6 @@ export const getWeeks = (date) => {
       return day;
     });
   });
-  // eslint-disable-next-line
-  console.log('newWeeks', newWeeks);
   return newWeeks;
 }
 
@@ -67,6 +65,9 @@ export const setEventData = (data) => {
     ...event,
     date: moment(date),
     time: moment(time),
+    id: uniqId(),
     weather: weather.weather[0] || null
   }
 }
+
+export const uniqId = () => new Date().valueOf();

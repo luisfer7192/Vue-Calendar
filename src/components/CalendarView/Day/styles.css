@@ -26,6 +26,7 @@
 
 .tagContainer {
   position: relative;
+  width: 100%;
 }
 
 .tagTitle {
@@ -34,5 +35,9 @@
   overflow: hidden;
   white-space: nowrap;
   max-width: 148px;
+  display: block;
+}
+
+.tagGroup {
   display: block;
 }

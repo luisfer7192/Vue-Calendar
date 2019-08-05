@@ -1,15 +1,15 @@
 <template>
-  <div class="column day" :class="{ disable: !day.day }" @click="openCreate()">
+  <div class="column is-2 day" :class="{ disable: !day.day }" @click="openCreate()">
     <span class="dayText" :class="{ currentDate: isCurrentDate }">{{day.dayOfMonth}}</span>
-    <b-taglist>
-        <b-tag type="is-info" v-for="(event, index) in getEvetnsDay" :key="index" class="tagContainer">
+    <b-taglist class="tagGroup">
+        <b-tag v-for="(event, index) in getEvetnsDay" :key="index" class="tagContainer" @click.native.stop="openEdit(event)" :type="event.color">
           <img
             v-if="event.weather"
             :src="eventSrcWeather(event)"
             :alt="eventNameWeather(event)"
             class="weather"
           />
-          <b-tooltip :label="'Weather: ' +eventNameWeather(event) + ', title: ' + event.title">
+          <b-tooltip :label="tooltipText(event)">
             <span class="tagTitle">{{ event.title }}</span>
           </b-tooltip>
         </b-tag>
@@ -28,10 +28,15 @@ export default {
     events: Object
   },
   methods: {
-    ...mapMutations([ 'openDialogCreate' ]),
+    ...mapMutations([ 'openDialogCreate', 'openDialogEdit' ]),
     openCreate () {
       if (this.day.day) {
         this.openDialogCreate(this.day);
+      }
+    },
+    openEdit (event) {
+      if (this.day.day) {
+        this.openDialogEdit({event, day: this.day});
       }
     },
     eventSrcWeather (event) {
@@ -39,6 +44,11 @@ export default {
     },
     eventNameWeather (event) {
       return event.weather.main;
+    },
+    tooltipText (event) {
+      const weather = this.eventNameWeather(event);
+      const time = event.time.format("hh:mm A");
+      return `Weather: ${weather}, time: ${time}, title: ${event.title}`
     }
   },
   computed: {
@@ -49,19 +59,12 @@ export default {
       return moment(new Date()).isSame(this.day.day, 'day');
     },
     getEvetnsDay () {
-      // eslint-disable-next-line
-      console.log('this.events', this.events, this.day.day);
       if (this.day.day) {
         const dateIndex = this.day.day.format("DD-MM-YYYY");
-        return this.events[dateIndex] ? this.events[dateIndex] : [];
+        const eventsDay = this.events[dateIndex] ? this.events[dateIndex] : [];
+        return eventsDay.sort((a, b) => a.time.valueOf() - b.time.valueOf());
       }
       return [];
-    }
-  },
-  events: {
-    events(newVal, oldVal) {
-      // eslint-disable-next-line
-      console.log({newVal, oldVal});
     }
   }
 }

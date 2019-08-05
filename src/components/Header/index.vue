@@ -16,16 +16,16 @@
       <b-navbar-item @click.native="navigateTo('calendarView')">
         Calendar
       </b-navbar-item>
-      <b-navbar-item @click.native="setToday()" v-if="isPathCalendar">
+      <b-navbar-item @click.native="actionSetToday()" v-if="isPathCalendar">
         Today
       </b-navbar-item>
-      <b-navbar-item @click.native="changeMonth(false)" v-if="isPathCalendar">
+      <b-navbar-item @click.native="actionChangeMonth(false)" v-if="isPathCalendar">
         <b-icon
           icon="chevron-left"
           size="is-medium">
         </b-icon>
       </b-navbar-item>
-      <b-navbar-item @click.native="changeMonth(true)" v-if="isPathCalendar">
+      <b-navbar-item @click.native="actionChangeMonth(true)" v-if="isPathCalendar">
         <b-icon
           icon="chevron-right"
           size="is-medium">
@@ -45,12 +45,12 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'Header',
   methods: {
-    ...mapMutations([ 'changeMonth', 'setToday' ]),
+    ...mapActions([ 'actionChangeMonth', 'actionSetToday' ]),
     navigateTo(name) {
       // eslint-disable-next-line
       console.log({name});

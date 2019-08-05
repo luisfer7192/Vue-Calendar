@@ -2,7 +2,7 @@
   <form @submit.prevent="onSubmit">
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">Create Event on {{ dayInText }}</p>
+        <p class="modal-card-title">{{ isCreate ? 'Create' : 'Edit' }} Event on {{ dayInText }}</p>
       </header>
       <section class="modal-card-body">
         <div class="columns">
@@ -24,7 +24,7 @@
               <b-datepicker
                 placeholder="Click to select..."
                 icon="calendar-today"
-                :value="date"
+                v-model="date"
                 name="date"
                 v-validate="'required'">
               </b-datepicker>
@@ -35,7 +35,7 @@
               <b-clockpicker
                 placeholder="Click to select..."
                 icon="clock"
-                :value="time"
+                v-model="time"
                 name="time"
                 v-validate="'required'">
               </b-clockpicker>
@@ -74,8 +74,10 @@
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button" type="button" @click="closeDialog()">Close</button>
-        <button type="submit" class="button is-primary">Create</button>
+        <b-button type="is-white" @click="closeDialog()">Close</b-button>
+        <b-button type="is-primary" v-if="isLoading" :loading="isLoading">Loading</b-button>
+        <b-button tag="input" v-if="!isLoading" type="is-primary" native-type="submit" :value="isCreate ? 'Create' : 'Edit'" />
+        <button v-if="!isCreate" @click="deleteEvent()" type="button" class="button is-danger">Delete</button>
       </footer>
     </div>
   </form>
@@ -90,6 +92,7 @@ export default {
   name: 'ModalForm',
   data: function () {
     return {
+      isCreate: true,
       title: '',
       time: new Date(),
       date: new Date(),
@@ -97,26 +100,45 @@ export default {
       citySelected: null,
       color: '',
       colors: [
-        { name: 'Red', value: '#ff0000' },
-        { name: 'Blue', value: '#0083ff' },
-        { name: 'Green', value: '#04f739' },
-        { name: 'Black', value: '#000000' },
-        { name: 'Pink', value: '#f9c0c0' }
+        { name: 'Red', value: 'is-danger' },
+        { name: 'Blue', value: 'is-info' },
+        { name: 'Green', value: 'is-success' },
+        { name: 'Black', value: 'is-black' },
+        { name: 'Purple', value: 'is-primary' },
+        { name: 'White', value: 'is-white' },
+        { name: 'Gray', value: 'is-light' },
+        { name: 'Dark Gray', value: 'is-dark' },
+        { name: 'Yellow', value: 'is-warning' }
       ]
     }
   },
   mounted () {
-    const newDay = this.selectedDay ? this.selectedDay.day.toDate() : new Date();
-    this.date = newDay;
-    this.time = newDay;
+    if (this.currentEvent) {
+      // eslint-disable-next-line
+      this.date = this.currentEvent.date.toDate();
+      this.time = this.currentEvent.time.toDate();
+      this.cityName = this.currentEvent.city.name;
+      this.citySelected = this.currentEvent.city;
+      this.color = this.currentEvent.color;
+      this.title = this.currentEvent.title;
+      this.isCreate = false;
+    } else {
+      const newDay = this.selectedDay ? this.selectedDay.day.toDate() : new Date();
+      this.date = newDay;
+      this.time = newDay;
+      this.isCreate = true;
+    }
   },
   methods: {
-    ...mapActions([ 'createEvent' ]),
+    ...mapActions([ 'createEvent', 'editEvent', 'deleteEvent' ]),
     ...mapMutations([ 'closeDialog' ]),
     onSubmit () {
       this.$validator.validateAll().then((result) => {
         if (result) {
-          return this.createEvent({ title: this.title, date: this.date, time: this.time, city: this.citySelected, color: this.color });
+          if (this.isCreate) {
+            return this.createEvent({ title: this.title, date: this.date, time: this.time, city: this.citySelected, color: this.color });  
+          }
+          return this.editEvent({ title: this.title, date: this.date, time: this.time, city: this.citySelected, color: this.color });
         }
         this.$buefy.toast.open({
           message: 'Form is not valid! Please check the fields.',
@@ -127,7 +149,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ selectedDay: 'getSelectedDay' }),
+    ...mapGetters({ selectedDay: 'getSelectedDay', currentEvent: 'getCurrentEvent', isLoading: 'getIsLoading' }),
     filteredCities() {
       return citiesJson.filter((option) => {
         return option.name
