@@ -1,7 +1,11 @@
 <template>
-  <div class="hello">
-    <p>I am the home body</p>
-    <button @click="navigateToSecondView" >Go to Second View {{ sayHi }}</button>
+  <div class="columns root">
+    <div class="column is-half is-offset-one-quarter">
+      <h4 class="centerText title">Welcome to my Calendar</h4>
+      <p class="centerText">This is an example of a Calendar in VueJs.</p>
+      <p class="centerText">In the header go to Calendar.</p>
+      <p class="centerText">I hope you enjoy it!.</p>
+    </div>
   </div>
 </template>
 
@@ -21,5 +25,4 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped src="./styles.css"> </style>

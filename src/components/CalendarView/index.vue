@@ -1,20 +1,30 @@
 <template>
-  <div class="hello">
-    <p>I am the Calendar view body</p>
-    <button @click="navigateToHome" >Go to Home</button>
+  <div class="columns root">
+    <Calendar />
+    <b-modal :active="dialog" has-modal-card :on-cancel="closeDialog">
+      <ModalForm />
+    </b-modal>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex';
+import Calendar from './Calendar';
+import ModalForm from '../ModalForm';
+
 export default {
-  name: 'Calendar',
+  name: 'CalendarView',
+  components: {
+    Calendar,
+    ModalForm
+  },
   methods: {
-    navigateToHome() {
-        this.$router.push({ name: 'home' });
-    }
+    ...mapMutations([ 'closeDialog' ])
+  },
+  computed: {
+    ...mapGetters({ dialog: 'getStatusDialog' })
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped src="./styles.css"> </style>

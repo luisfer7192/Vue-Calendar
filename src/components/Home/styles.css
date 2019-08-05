@@ -1,0 +1,16 @@
+.root {
+  margin-top: 50px;
+}
+
+.content p {
+  margin-bottom: 5px;
+}
+
+.title {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.centerText {
+  text-align: center;
+}
