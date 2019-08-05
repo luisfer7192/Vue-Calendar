@@ -1,14 +1,42 @@
 import Vue from 'vue'
+import { ToastProgrammatic as Toast } from 'buefy'
 import moment from 'moment';
-import { getWeeks } from '../../utils';
+import { getWeeks, setEventData } from '../../utils';
+import { getWeather } from '../api';
 
 const state = {
-  events: [],
+  // add an event example for today
+  events: {
+    [moment(new Date()).format("DD-MM-YYYY")]: [
+      {
+        color: "#0083ff",
+        date: moment(new Date()),
+        time: moment(new Date()),
+        title: "example of a long text in tag djsada djs akjd l",
+        city: {
+          country: "PH",
+          id: 1688216,
+          name: "Santa Cruz"
+        },
+        weather: {
+          description: "light rain",
+          icon: "10n",
+          id: 500,
+          main: "Rain"
+        }
+      }
+    ]
+  },
   currentDate: {
     date: moment(new Date()),
     text: moment(new Date()).format("MMMM YYYY")
   },
-  dialog: false
+  selectedDay: {
+    day: null,
+    dayOfMonth: ''
+  },
+  dialog: false,
+  weeks: []
 }
 
 const mutations = {
@@ -38,13 +66,43 @@ const mutations = {
   },
   openDialogCreate (state, day) {
     // eslint-disable-next-line
-    console.log('day', day);
+    console.log('day openDialogCreate', day);
+    Vue.set(state, 'selectedDay', day);
     Vue.set(state, 'dialog', true);
+  },
+  setEvent (state, data) {
+    const newData = setEventData(data);
+    const dateIndex = newData.date.format("DD-MM-YYYY");
+    if (state.events[dateIndex]) {
+      state.events[dateIndex].push(newData);
+    } else {
+      state.events[dateIndex] = [newData];
+    }
+    const newEvents = state.events;
+    Vue.set(state, 'events', newEvents);
+    // refresh the list of weeks
+    const weeks = getWeeks(state.currentDate.date.clone())
+    Vue.set(state, 'weeks', weeks);
+  },
+  refreshWeeks (state) {
+    const weeks = getWeeks(state.currentDate.date.clone())
+    Vue.set(state, 'weeks', weeks);
   }
 }
 
 const actions = {
-  
+  async createEvent ({ commit }, payload) {
+    const weather = await getWeather(payload.city.id);
+    if (weather) {
+      commit('setEvent', { event: payload, weather })
+    } else {
+      Toast.open({
+        message: 'Error getting the weather',
+        type: 'is-danger',
+        position: 'is-bottom'
+      });
+    }
+  }
 }
 
 const getters = {
@@ -55,8 +113,8 @@ const getters = {
   },
   getWeeks () {
     // eslint-disable-next-line
-    console.log('getWeeks', state.currentDate);
-    return getWeeks(state.currentDate.date.clone());
+    console.log('getWeeks', state.weeks);
+    return state.weeks;
   },
   getCurrentMonthText () {
     // eslint-disable-next-line
@@ -65,6 +123,12 @@ const getters = {
   },
   getStatusDialog () {
     return state.dialog;
+  },
+  getSelectedDay () {
+    return state.selectedDay;
+  },
+  getEvents () {
+    return state.events;
   }
 }
 

@@ -1,68 +1,71 @@
 <template>
-  <form action="">
+  <form @submit.prevent="onSubmit">
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">Create Event</p>
+        <p class="modal-card-title">Create Event on {{ dayInText }}</p>
       </header>
       <section class="modal-card-body">
         <div class="columns">
           <div class="column is-12">
-            <b-field label="Title">
+            <b-field label="Title" :type="{'is-danger': errors.has('title')}" :message="errors.first('title')">
               <b-input
-                :value="title"
+                v-model="title"
+                name="title"
                 placeholder="Add title"
-                required
-                maxlength="30">
+                v-validate="'required|max:30'"
+                icon="text">
               </b-input>
             </b-field>
           </div>
         </div>
         <div class="columns">
           <div class="column is-6">
-            <b-field label="Select a date">
+            <b-field label="Select a date" :type="{'is-danger': errors.has('date')}" :message="errors.first('date')">
               <b-datepicker
                 placeholder="Click to select..."
                 icon="calendar-today"
                 :value="date"
-                required>
+                name="date"
+                v-validate="'required'">
               </b-datepicker>
             </b-field>
           </div>
           <div class="column is-6">
-            <b-field label="Select time">
+            <b-field label="Select time" :type="{'is-danger': errors.has('time')}" :message="errors.first('time')">
               <b-clockpicker
                 placeholder="Click to select..."
                 icon="clock"
                 :value="time"
-                required>
+                name="time"
+                v-validate="'required'">
               </b-clockpicker>
             </b-field>
           </div>
         </div>
         <div class="columns">
           <div class="column is-6">
-            <b-field label="City">
+            <b-field label="City" :type="{'is-danger': errors.has('cityName')}" :message="errors.first('cityName')">
                 <b-autocomplete
                     v-model="cityName"
+                    name="cityName"
                     :data="filteredCities"
                     field="name"
                     :open-on-focus="true"
                     placeholder="Select a city"
                     icon="magnify"
                     @select="option => citySelected = option"
-                    required>
+                    v-validate="'required'">
                     <template slot="empty">No results found</template>
                 </b-autocomplete>
             </b-field>
           </div>
           <div class="column is-6">
-            <b-field label="Color">
-              <b-select placeholder="Select a color" expanded required>
+            <b-field label="Color" :type="{'is-danger': errors.has('color')}" :message="errors.first('color')">
+              <b-select placeholder="Select a color" expanded icon="palette" v-model="color" name="color" v-validate="'required'">
                 <option
-                    v-for="(option, index) in colors"
-                    :value="option.value"
-                    :key="index"
-                    v-model="color">
+                  v-for="(option, index) in colors"
+                  :value="option.value"
+                  :key="index">
                     {{ option.name }}
                 </option>
               </b-select>
@@ -72,14 +75,14 @@
       </section>
       <footer class="modal-card-foot">
         <button class="button" type="button" @click="closeDialog()">Close</button>
-        <button class="button is-primary">Create</button>
+        <button type="submit" class="button is-primary">Create</button>
       </footer>
     </div>
   </form>
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 // I remove a lot of cities. just use some of them
 import citiesJson from '../../data/openweather_cities.json';
 
@@ -102,10 +105,29 @@ export default {
       ]
     }
   },
+  mounted () {
+    const newDay = this.selectedDay ? this.selectedDay.day.toDate() : new Date();
+    this.date = newDay;
+    this.time = newDay;
+  },
   methods: {
-    ...mapMutations([ 'closeDialog' ])
+    ...mapActions([ 'createEvent' ]),
+    ...mapMutations([ 'closeDialog' ]),
+    onSubmit () {
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          return this.createEvent({ title: this.title, date: this.date, time: this.time, city: this.citySelected, color: this.color });
+        }
+        this.$buefy.toast.open({
+          message: 'Form is not valid! Please check the fields.',
+          type: 'is-danger',
+          position: 'is-bottom'
+        })
+      });
+    }
   },
   computed: {
+    ...mapGetters({ selectedDay: 'getSelectedDay' }),
     filteredCities() {
       return citiesJson.filter((option) => {
         return option.name
@@ -113,6 +135,9 @@ export default {
           .toLowerCase()
           .indexOf(this.cityName.toLowerCase()) >= 0;
       })
+    },
+    dayInText() {
+      return this.selectedDay.day.format("dddd, MMMM Do YYYY");
     }
   }
 }

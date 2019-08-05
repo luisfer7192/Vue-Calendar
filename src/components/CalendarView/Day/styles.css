@@ -16,3 +16,23 @@
 .currentDate {
   color: #2F74B5;
 }
+
+.weather {
+  height: 25px;
+  position: absolute;
+  left: 0;
+  top: -2px;
+}
+
+.tagContainer {
+  position: relative;
+}
+
+.tagTitle {
+  padding-left: 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 148px;
+  display: block;
+}

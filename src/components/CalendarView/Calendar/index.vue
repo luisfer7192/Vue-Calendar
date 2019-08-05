@@ -4,13 +4,13 @@
       <div class="column day" v-for="(day, index) in days" :key="index">{{day}}</div>
     </div>
     <div class="columns column is-12 week body" v-for="(week, index) in weeks" :key="index">
-      <Day v-for="(day, dayIndex) in week" :key="dayIndex" :day="day" />
+      <Day v-for="(day, dayIndex) in week" :key="dayIndex" :day="day" :events="events" />
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import Day from '../Day';
 
 export default {
@@ -29,10 +29,17 @@ export default {
         'Friday',
         'Saturday'
       ],
+      // events: {}
     }
   },
+  mounted() {
+    this.refreshWeeks();
+  },
+  methods: {
+    ...mapMutations([ 'refreshWeeks' ])
+  },
   computed: {
-    ...mapGetters({ currentDate: 'getCurrentDate', weeks: 'getWeeks' })
+    ...mapGetters({ currentDate: 'getCurrentDate', weeks: 'getWeeks', events: 'getEvents' })
   }
 }
 </script>

@@ -34,7 +34,7 @@ export const getWeeks = (date) => {
     return week.map((day, dayIndex) => {
       if (weekIndex === 0 && !day) {
         return {
-          day: null,
+          day,
           dayOfMonth: daysMonthBefore - (countNulls - (dayIndex + 1))
         }
       } else if (weekIndex !== 1 && !day) {
@@ -47,6 +47,8 @@ export const getWeeks = (date) => {
       return day;
     });
   });
+  // eslint-disable-next-line
+  console.log('newWeeks', newWeeks);
   return newWeeks;
 }
 
@@ -56,4 +58,15 @@ const weekOfMonth = (date) => {
     weekInYearIndex = date.clone().subtract(1,'week').week() + 1;
   }
   return weekInYearIndex - moment(date).startOf('month').week() + 1;
+}
+
+export const setEventData = (data) => {
+  const { date, time, ...event } = data.event;
+  const weather = data.weather;
+  return {
+    ...event,
+    date: moment(date),
+    time: moment(time),
+    weather: weather.weather[0] || null
+  }
 }
