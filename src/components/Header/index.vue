@@ -52,8 +52,6 @@ export default {
   methods: {
     ...mapActions([ 'actionChangeMonth', 'actionSetToday' ]),
     navigateTo(name) {
-      // eslint-disable-next-line
-      console.log({name});
       this.$router.push({ name });
     }
   },
